@@ -1,5 +1,5 @@
 (function() {
-  var callWithJQuery,
+  var callWithJQuery, identityFunction,
     indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
     slice = [].slice,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -13,6 +13,10 @@
     } else {
       return pivotModule(jQuery);
     }
+  };
+
+  identityFunction = function(str) {
+    return str;
   };
 
   callWithJQuery(function($) {
@@ -737,7 +741,7 @@
     Default Renderer for hierarchical table layout
      */
     pivotTableRenderer = function(pivotData, opts) {
-      var aggregator, c, colAttrs, colKey, colKeys, defaults, i, j, r, result, rowAttrs, rowKey, rowKeys, spanSize, tbody, td, th, thead, totalAggregator, tr, txt, val, x;
+      var aggregator, c, colAttrs, colKey, colKeys, defaults, i, j, labelFormatter, r, result, rowAttrs, rowKey, rowKeys, spanSize, tbody, td, th, thead, totalAggregator, tr, txt, val, x;
       defaults = {
         localeStrings: {
           totals: "Totals"
@@ -748,6 +752,7 @@
       rowAttrs = pivotData.rowAttrs;
       rowKeys = pivotData.getRowKeys();
       colKeys = pivotData.getColKeys();
+      labelFormatter = opts.labelFormatter || identityFunction;
       result = document.createElement("table");
       result.className = "pvtTable";
       spanSize = function(arr, i, j) {
@@ -791,7 +796,7 @@
         }
         th = document.createElement("th");
         th.className = "pvtAxisLabel";
-        th.textContent = c;
+        th.textContent = labelFormatter(c);
         tr.appendChild(th);
         for (i in colKeys) {
           if (!hasProp.call(colKeys, i)) continue;
@@ -824,7 +829,7 @@
           r = rowAttrs[i];
           th = document.createElement("th");
           th.className = "pvtAxisLabel";
-          th.textContent = r;
+          th.textContent = labelFormatter(r);
           tr.appendChild(th);
         }
         th = document.createElement("th");
@@ -913,7 +918,7 @@
     Pivot Table core: create PivotData object and call Renderer on it
      */
     $.fn.pivot = function(input, opts) {
-      var defaults, e, error, error1, pivotData, result, x;
+      var defaults, e, pivotData, result, x;
       defaults = {
         cols: [],
         rows: [],
@@ -943,8 +948,8 @@
           }
           result = $("<span>").html(opts.localeStrings.renderError);
         }
-      } catch (error1) {
-        e = error1;
+      } catch (error) {
+        e = error;
         if (typeof console !== "undefined" && console !== null) {
           console.error(e.stack);
         }
@@ -961,7 +966,7 @@
     Pivot Table UI: calls Pivot Table core above with options set by user
      */
     $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-      var a, aggregator, attrLength, axisValues, c, colList, defaults, e, error, existingOpts, fn, i, initialRender, k, l, len1, len2, len3, len4, n, o, opts, pivotTable, q, ref, ref1, ref2, ref3, ref4, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tblCols, tr1, tr2, uiTable, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
+      var a, aggregator, attrLength, axisValues, c, colList, defaults, e, existingOpts, fn, i, initialRender, k, l, labelFormatter, len1, len2, len3, len4, n, o, opts, pivotTable, q, ref, ref1, ref2, ref3, ref4, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tblCols, tr1, tr2, uiTable, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
       if (overwrite == null) {
         overwrite = false;
       }
@@ -989,6 +994,7 @@
           localeStrings: locales[locale].localeStrings
         },
         onRefresh: null,
+        labelFormatter: identityFunction,
         filter: function() {
           return true;
         },
@@ -1001,6 +1007,7 @@
       } else {
         opts = existingOpts;
       }
+      labelFormatter = opts.labelFormatter;
       try {
         input = PivotData.convertToArray(input);
         tblCols = (function() {
@@ -1179,7 +1186,7 @@
             return valueList.find('.pvtCheckContainer p').show();
           };
           triangleLink = $("<span>").addClass('pvtTriangle').html(" &#x25BE;").bind("click", showFilterList);
-          attrElem = $("<li>").addClass("axis_" + i).append($("<span>").addClass('pvtAttr').text(c).data("attrName", c).append(triangleLink));
+          attrElem = $("<li>").addClass("axis_" + i).append($("<span>").addClass('pvtAttr').text(labelFormatter(c)).data("attrName", c).append(triangleLink));
           if (hasExcludedItem) {
             attrElem.addClass('pvtFilteredAttribute');
           }
@@ -1267,7 +1274,7 @@
                 });
                 for (t = 0, len5 = shownAttributes.length; t < len5; t++) {
                   attr = shownAttributes[t];
-                  newDropdown.append($("<option>").val(attr).text(attr));
+                  newDropdown.append($("<option>").val(attr).text(labelFormatter(attr)));
                 }
                 pvtVals.append(newDropdown);
               }

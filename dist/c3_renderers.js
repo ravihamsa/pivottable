@@ -1,5 +1,5 @@
 (function() {
-  var callWithJQuery;
+  var callWithJQuery, identityFunction;
 
   callWithJQuery = function(pivotModule) {
     if (typeof exports === "object" && typeof module === "object") {
@@ -11,6 +11,10 @@
     }
   };
 
+  identityFunction = function(str) {
+    return str;
+  };
+
   callWithJQuery(function($, c3) {
     var makeC3Chart;
     makeC3Chart = function(chartOpts) {
@@ -18,7 +22,7 @@
         chartOpts = {};
       }
       return function(pivotData, opts) {
-        var agg, attrs, base, base1, base2, base3, base4, base5, colKey, colKeys, columns, dataColumns, defaults, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, k, l, len, len1, len2, len3, len4, m, numCharsInHAxis, numSeries, params, ref, ref1, ref2, ref3, renderArea, result, rotationAngle, row, rowHeader, rowKey, rowKeys, s, scatterData, series, title, titleText, vAxisTitle, val, vals, x, xs;
+        var agg, attrs, base, base1, base2, base3, base4, base5, colKey, colKeys, columns, dataColumns, defaults, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, k, l, labelFormatter, len, len1, len2, len3, len4, m, numCharsInHAxis, numSeries, params, ref, ref1, ref2, ref3, renderArea, result, rotationAngle, row, rowHeader, rowKey, rowKeys, s, scatterData, series, title, titleText, vAxisTitle, val, vals, x, xs;
         defaults = {
           localeStrings: {
             vs: "vs",
@@ -36,6 +40,7 @@
         if ((base2 = opts.c3.size).height == null) {
           base2.height = window.innerHeight / 1.4 - 50;
         }
+        labelFormatter = opts.labelFormatter || identityFunction;
         if (chartOpts.type == null) {
           chartOpts.type = "line";
         }
@@ -68,8 +73,8 @@
             t: {}
           };
           attrs = pivotData.rowAttrs.concat(pivotData.colAttrs);
-          vAxisTitle = (ref = attrs[0]) != null ? ref : "";
-          hAxisTitle = (ref1 = attrs[1]) != null ? ref1 : "";
+          vAxisTitle = (ref = labelFormatter(attrs[0])) != null ? ref : "";
+          hAxisTitle = (ref1 = labelFormatter(attrs[1])) != null ? ref1 : "";
           groupByTitle = attrs.slice(2).join("-");
           titleText = vAxisTitle;
           if (hAxisTitle !== "") {

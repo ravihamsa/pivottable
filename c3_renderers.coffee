@@ -6,6 +6,8 @@ callWithJQuery = (pivotModule) ->
     # Plain browser env
     else
         pivotModule jQuery, c3
+
+identityFunction = (str) -> str;
         
 callWithJQuery ($, c3) ->
 
@@ -20,6 +22,7 @@ callWithJQuery ($, c3) ->
         opts.c3.size ?= {}
         opts.c3.size.width ?= window.innerWidth / 1.4
         opts.c3.size.height ?= window.innerHeight / 1.4 - 50
+        labelFormatter = opts.labelFormatter || identityFunction
         chartOpts.type ?= "line"
 
         rowKeys = pivotData.getRowKeys()
@@ -37,8 +40,8 @@ callWithJQuery ($, c3) ->
         if chartOpts.type == "scatter"
             scatterData = x:{}, y:{}, t:{}
             attrs = pivotData.rowAttrs.concat(pivotData.colAttrs)
-            vAxisTitle = attrs[0] ? ""
-            hAxisTitle = attrs[1] ? "" 
+            vAxisTitle = labelFormatter(attrs[0]) ? ""
+            hAxisTitle = labelFormatter(attrs[1]) ? ""
             groupByTitle = attrs.slice(2).join("-")
             titleText = vAxisTitle
             titleText += " #{opts.localeStrings.vs} #{hAxisTitle}" if hAxisTitle != ""
