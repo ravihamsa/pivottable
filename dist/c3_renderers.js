@@ -64,7 +64,11 @@
         rotationAngle = 0;
         fullAggName = pivotData.aggregatorName;
         if (pivotData.valAttrs.length) {
-          fullAggName += "(" + (pivotData.valAttrs.join(", ")) + ")";
+          fullAggName += "(" + (pivotData.valAttrs.map((function(_this) {
+            return function(attr) {
+              return labelFormatter(attr);
+            };
+          })(this)).join(", ")) + ")";
         }
         if (chartOpts.type === "scatter") {
           scatterData = {
@@ -138,13 +142,25 @@
             }
             columns.push(row);
           }
-          vAxisTitle = pivotData.aggregatorName + (pivotData.valAttrs.length ? "(" + (pivotData.valAttrs.join(", ")) + ")" : "");
-          hAxisTitle = pivotData.colAttrs.join("-");
+          vAxisTitle = pivotData.aggregatorName + (pivotData.valAttrs.length ? "(" + (pivotData.valAttrs.map((function(_this) {
+            return function(attr) {
+              return labelFormatter(attr);
+            };
+          })(this)).join(", ")) + ")" : "");
+          hAxisTitle = pivotData.colAttrs.map((function(_this) {
+            return function(attr) {
+              return labelFormatter(attr);
+            };
+          })(this)).join("-");
           titleText = fullAggName;
           if (hAxisTitle !== "") {
             titleText += " " + opts.localeStrings.vs + " " + hAxisTitle;
           }
-          groupByTitle = pivotData.rowAttrs.join("-");
+          groupByTitle = pivotData.rowAttrs.map((function(_this) {
+            return function(attr) {
+              return labelFormatter(attr);
+            };
+          })(this)).join("-");
           if (groupByTitle !== "") {
             titleText += " " + opts.localeStrings.by + " " + groupByTitle;
           }

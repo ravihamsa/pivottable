@@ -35,7 +35,7 @@ callWithJQuery ($, c3) ->
 
         fullAggName = pivotData.aggregatorName 
         if pivotData.valAttrs.length
-            fullAggName += "(#{pivotData.valAttrs.join(", ")})"
+            fullAggName += "(#{pivotData.valAttrs.map((attr)=>labelFormatter(attr)).join(", ")})"
 
         if chartOpts.type == "scatter"
             scatterData = x:{}, y:{}, t:{}
@@ -82,12 +82,12 @@ callWithJQuery ($, c3) ->
                 columns.push row
 
             vAxisTitle = pivotData.aggregatorName+ 
-                if pivotData.valAttrs.length then "(#{pivotData.valAttrs.join(", ")})" else ""
-            hAxisTitle = pivotData.colAttrs.join("-")
+                if pivotData.valAttrs.length then "(#{pivotData.valAttrs.map((attr)=>labelFormatter(attr)).join(", ")})" else ""
+            hAxisTitle = pivotData.colAttrs.map((attr)=>labelFormatter(attr)).join("-")
 
             titleText = fullAggName
             titleText += " #{opts.localeStrings.vs} #{hAxisTitle}" if hAxisTitle != ""
-            groupByTitle = pivotData.rowAttrs.join("-")
+            groupByTitle = pivotData.rowAttrs.map((attr)=>labelFormatter(attr)).join("-")
             titleText += " #{opts.localeStrings.by} #{groupByTitle}" if groupByTitle != ""
             
         title = $("<p>", {style: "text-align: center; font-weight: bold"})
