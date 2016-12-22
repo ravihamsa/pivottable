@@ -966,7 +966,7 @@
     Pivot Table UI: calls Pivot Table core above with options set by user
      */
     $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-      var a, aggregator, attrLength, axisValues, c, colList, defaults, e, existingOpts, fn, i, initialRender, k, l, labelFormatter, len1, len2, len3, len4, n, o, opts, pivotTable, q, ref, ref1, ref2, ref3, ref4, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tblCols, tr1, tr2, uiTable, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
+      var a, aggregator, attrLength, axisValues, c, colList, defaults, e, existingOpts, fn, i, initialRender, k, l, labelFormatter, len1, len2, len3, len4, n, o, opts, pivotTable, q, ref, ref1, ref2, ref3, ref4, refresh, refreshDelayed, renderer, rendererControl, row1, row1Col1, row1Col2, row2, row2Col1, row2Col2, shownAttributes, tblCols, tr1, tr2, uiTable, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
       if (overwrite == null) {
         overwrite = false;
       }
@@ -1051,10 +1051,34 @@
           }
           return results;
         });
-        uiTable = $("<table>", {
+        row1 = $('<div>', {
+          "class": 'row'
+        });
+        row1Col1 = $('<div>', {
+          "class": 'col-md-3'
+        });
+        row1Col2 = $('<div>', {
+          "class": 'col-md-9'
+        });
+        row1.append(row1Col1);
+        row1.append(row1Col2);
+        row2 = $('<div>', {
+          "class": 'row'
+        });
+        row2Col1 = $('<div>', {
+          "class": 'col-md-3'
+        });
+        row2Col2 = $('<div>', {
+          "class": 'col-md-9'
+        });
+        row2.append(row2Col1);
+        row2.append(row2Col2);
+        uiTable = $("<div>", {
           "class": "pvtUi"
-        }).attr("cellpadding", 5);
-        rendererControl = $("<td>");
+        });
+        uiTable.append(row1);
+        uiTable.append(row2);
+        rendererControl = $("<div>");
         renderer = $("<select>").addClass('pvtRenderer').appendTo(rendererControl).bind("change", function() {
           return refresh();
         });
@@ -1063,7 +1087,7 @@
           if (!hasProp.call(ref1, x)) continue;
           $("<option>").val(x).html(x).appendTo(renderer);
         }
-        colList = $("<td>").addClass('pvtAxisContainer pvtUnused');
+        colList = $("<div>").addClass('pvtAxisContainer pvtUnused');
         shownAttributes = (function() {
           var len2, n, results;
           results = [];
@@ -1089,11 +1113,7 @@
           }
           unusedAttrsVerticalAutoOverride = attrLength > unusedAttrsVerticalAutoCutoff;
         }
-        if (opts.unusedAttrsVertical === true || unusedAttrsVerticalAutoOverride) {
-          colList.addClass('pvtVertList');
-        } else {
-          colList.addClass('pvtHorizList');
-        }
+        colList.addClass('pvtHorizList');
         fn = function(c) {
           var attrElem, btns, checkContainer, filterItem, filterItemExcluded, hasExcludedItem, keys, len3, o, ref2, showFilterList, triangleLink, updateFilter, v, valueList;
           keys = (function() {
@@ -1199,6 +1219,8 @@
           fn(c);
         }
         tr1 = $("<tr>").appendTo(uiTable);
+        row1Col1.append(rendererControl);
+        row1Col2.append(colList);
         aggregator = $("<select>").addClass('pvtAggregator').bind("change", function() {
           return refresh();
         });
@@ -1207,17 +1229,11 @@
           if (!hasProp.call(ref2, x)) continue;
           aggregator.append($("<option>").val(x).html(x));
         }
-        $("<td>").addClass('pvtVals').appendTo(tr1).append(aggregator).append($("<br>"));
+        $("<div>").addClass('pvtVals').appendTo(row1Col1).append(aggregator).append($("<br>"));
         $("<td>").addClass('pvtAxisContainer pvtHorizList pvtCols').appendTo(tr1);
         tr2 = $("<tr>").appendTo(uiTable);
         tr2.append($("<td>").addClass('pvtAxisContainer pvtRows').attr("valign", "top"));
         pivotTable = $("<td>").attr("valign", "top").addClass('pvtRendererArea').appendTo(tr2);
-        if (opts.unusedAttrsVertical === true || unusedAttrsVerticalAutoOverride) {
-          uiTable.find('tr:nth-child(1)').prepend(rendererControl);
-          uiTable.find('tr:nth-child(2)').prepend(colList);
-        } else {
-          uiTable.prepend($("<tr>").append(rendererControl).append(colList));
-        }
         this.html(uiTable);
         ref3 = opts.cols;
         for (o = 0, len3 = ref3.length; o < len3; o++) {
